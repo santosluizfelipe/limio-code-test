@@ -142,6 +142,7 @@
 .grouped-offers .grouped-offers-wrapper .offer-group-container .offers-container .offer-selection .offer-options .offer-option .offer-option-container {
   display: flex;
   flex-direction: column;
+  
 }
 
 .grouped-offers

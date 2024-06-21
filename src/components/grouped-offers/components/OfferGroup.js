@@ -74,7 +74,9 @@ type Props = {
   thumbnail: ?string,
   preselectFirstOfferInGroup: boolean,
   selectedGroup: Array<string>,
-  setSelectedGroup: (Array<string>) => void
+  setSelectedGroup: (Array<string>) => void,
+  addToBasket: (item: {}) => void,
+  promoCode: String,
 }
 
 function OfferGroup({
@@ -89,10 +91,10 @@ function OfferGroup({
   thumbnail,
   preselectFirstOfferInGroup,
   selectedGroup,
-  setSelectedGroup
+  setSelectedGroup,
+  addToBasket,
+  promoCode
 }: Props): React.Node {
-  const { shop } = { shop: { addToBasket: () => console.log("Add to basket!") } }
-  const { addToBasket } = shop
 
   const [firstOffer = {}] = offers
   const description = R.path(["data", "attributes", "offer_features__limio"], firstOffer) || "" // Get this from the first offer in the group (admittedly, not the best)
@@ -107,6 +109,12 @@ function OfferGroup({
 
   let redirect_url = ""
 
+
+  // helper function to pass the selected offers into the add basket prop
+  const handleButtonClick = () => {
+    addToBasket(selection, selection.data.attributes.display_price__limio, selection.data.attributes.detailed_display_price__limio, redirect_url + window.location.search);
+  };
+
   const selectOffer = offer => {
     setSelectedGroup(preselectFirstOfferInGroup ? R.uniq([groupId, ...selectedGroup]) : [groupId])
     setSelection(offer)
@@ -120,6 +128,9 @@ function OfferGroup({
           {thumbnail ? <img src={thumbnail.placeholder} /> : null}
           <h2 className="offers-heading">{label}</h2>
           <div className="offers-description-body" dangerouslySetInnerHTML={{ __html: description }} />
+          <div className="promo-section">
+            <p>Use promo code <strong>{promoCode}</strong> for a 20% discount!</p>
+          </div>
         </div>
         <div className="offer-selection">
           <div className="offer-options">
@@ -138,7 +149,8 @@ function OfferGroup({
             <Button
               id={`offer-group-button-${groupId}`}
               disabled={!groupSelected}
-              onClick={() => addToBasket(selection, undefined, undefined, redirect_url + window.location.search)}
+              // on click calls the helper function
+              onClick={handleButtonClick}
             >
               {ctaText || "Buy now"}
             </Button>
